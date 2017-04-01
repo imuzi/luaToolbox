@@ -97,6 +97,46 @@ function file.remove(path)
   os.remove(path)
 end
 
+
+-- get file in lines 
+-- return table contains each lines
+function file.lines(file) 
+  if not file.exists(file) then return {} end
+  local lines = {}
+  for line in io.lines(file) do 
+    lines[#lines + 1] = line
+  end
+  return lines
+end
+
+-- get all pathstring in folder 
+-- need lfs
+require("lfs")
+function file.getpathes(rootpath, pathes,func)
+    pathes = pathes or {}
+    for entry in lfs.dir(rootpath) do
+        if entry ~= '.' and entry ~= '..' then
+            local path = rootpath .. '\\' .. entry
+            local attr = lfs.attributes(path)
+            assert(type(attr) == 'table')
+            
+            if attr.mode == 'directory' then
+                getpathes(path, pathes,func)
+            else
+                if func then 
+                   func(path)
+                end 
+                 
+                table.insert(pathes, path)
+            end
+        end
+    end
+    return pathes
+end
+
+
+
+
 -- ## Exports
 --
 -- Export `file` as a Lua module.
